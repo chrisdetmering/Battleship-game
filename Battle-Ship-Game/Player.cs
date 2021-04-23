@@ -4,47 +4,33 @@ namespace Battle_Ship_Game
 {
     public class Player
     {
-        public Shot playerShot = new Shot();
 
 
-        public Shot AskPlayerForShot()
+        public int GetCoordinate(char coordinate)
         {
-            Console.WriteLine("Make a valid shot. Numbers from 1 to 10 only. \n");
-            // Asking X axis coordinate
-            Console.WriteLine("X axis: ");
-            Console.Write("> ");
-            string inputX = Console.ReadLine();
-            int SpotX;
-            if(Int32.TryParse(inputX, out SpotX)){
-                playerShot.SpotX = SpotX - 1;
-            } else {
-                playerShot.SpotX = 12;  // Out of grid range
-            }
-            // Asking Y axis coordinate   
-            Console.WriteLine("Y axis: ");
-            Console.Write("> ");
-            string inputY = Console.ReadLine();
-            int SpotY;
-            if(Int32.TryParse(inputY, out SpotY)){
-                playerShot.SpotY = SpotY - 1;
-            } else {
-                playerShot.SpotY = 12;
-            }
-            return playerShot;
+            
+            Message.PrintAskForCordinate(coordinate);
+
+            string input = Console.ReadLine();
+            int coord;
+
+            coord = Int32.Parse(input);
+
+            return coord - 1; 
         }
 
-        public bool ValidateShot(Shot shotToValidate)
+
+        public bool IsShotInBounds(int X, int Y)
         {
             bool isValidShot = false;
-            if( (shotToValidate.SpotX < 10 && shotToValidate.SpotX >= 0) &&
-                (shotToValidate.SpotY < 10 && shotToValidate.SpotY >= 0) )
+            if( (X < 10 && X >= 0) &&
+                (Y < 10 && Y >= 0) )
             {
                 isValidShot = true;
             }
             
             return isValidShot;
         }
-
 
     }
 }

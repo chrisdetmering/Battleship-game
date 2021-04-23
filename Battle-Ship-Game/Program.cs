@@ -25,10 +25,8 @@ namespace Battle_Ship_Game
             bool isPlayerReady = false;
             
             message.PrintWelcomeMessage();
+            message.PrintInitialPrompt();
 
-            Console.WriteLine("Do you want to play BattleShip Game?");
-            Console.WriteLine("Please type 'yes' or something else to quit:");
-            Console.Write("> ");
             string input = Console.ReadLine();
             if(input == "yes"){
                 isPlayerReady = true;

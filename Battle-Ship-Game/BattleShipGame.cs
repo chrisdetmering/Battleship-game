@@ -17,7 +17,7 @@ namespace Battle_Ship_Game
         int ShipHits = 5;
 
         bool isMissShot = true;
-        bool isCheckedShot = false;
+        //bool isCheckedShot = false;
 
         bool isShipSunk = false;
 
@@ -39,19 +39,12 @@ namespace Battle_Ship_Game
              while(isGameActive)
             {
                 // Ask Player for a Shot
-                bool isValidUniqueShot = AskForValidUniqueShot();
+                bool isValidShot = GetValidShot();
                
-                
-                if(isValidUniqueShot)
+   
+                if(isValidShot)
                 {
-                    isCheckedShot = CheckShotOnBoard();
-                } 
-
-               
-
-                if(isCheckedShot)
-                {
-                    printBoardGame();
+                    printBoardGame(isValidShot);
                     if(Attemps == 0 || ShipHits == 0)
                     {
                         // GameOver or we wont!!
@@ -64,7 +57,7 @@ namespace Battle_Ship_Game
                     }
                 }
                 
-                PrintAttempsAndHits();
+                message.PrintAttemptsAndHits(Attemps, ShipHits);
 
                 if(isShipSunk)
                 {
@@ -80,41 +73,46 @@ namespace Battle_Ship_Game
             }
         }
 
-        public void PrintAttempsAndHits()
-        {
-            Console.WriteLine("----------------------------------------------");
-            Console.WriteLine("|    Remaining attemps: {0}     |    Hits: {1}    |", Attemps, 5 - ShipHits);
-            Console.WriteLine("----------------------------------------------");
-        }
+      
 
-        public bool AskForValidUniqueShot()
+        public bool GetValidShot()
         {
-            bool isValidShot = false;
+            bool isInBounds = false; 
             bool isUniqueShot = false;
+            bool isCheckedShot = false; 
+        
 
-            do 
+            while(true)
             {
-                player.playerShot = player.AskPlayerForShot();
-                isValidShot = player.ValidateShot(player.playerShot);
-                if(isValidShot){
-                    isUniqueShot = CheckUniqueShot(player.playerShot);
-                } else 
+                message.PrintValidNumberRanges();
+                int xCoordinate = player.GetCoordinate('x');
+                int yCoordinate = player.GetCoordinate('y');
+                isInBounds = player.IsShotInBounds(xCoordinate, yCoordinate);
+                isUniqueShot = CheckUniqueShot(xCoordinate, yCoordinate);
+                isCheckedShot = CheckShotOnBoard(xCoordinate, yCoordinate);
+
+                if (isUniqueShot && isInBounds && isCheckedShot)
                 {
-                    Console.WriteLine("------------------------------------------------");
-                    Console.WriteLine("** INVALID SHOT **. Please enter valid shot.");
-                    Console.WriteLine("------------------------------------------------");
+                    break;
+                } else
+                {
+                    message.PrintInvalidShot();
                 }
-            } while(!isUniqueShot);
-            
-            return isUniqueShot;
+
+            }
+
+            return true;
         }
 
-        public bool CheckShotOnBoard()
-        {
-            int SpotX = player.playerShot.SpotX;
-            int SpotY = player.playerShot.SpotY;
 
-            if(gameBoard[SpotX, SpotY] == SpotStatus.Ship)
+
+
+
+        public bool CheckShotOnBoard(int X, int Y)
+        {
+       
+
+            if(gameBoard[X, Y] == SpotStatus.Ship)
             {
                 // We are shotting on the ship
                 // We have to count 5 - 1 = on the ship
@@ -122,12 +120,12 @@ namespace Battle_Ship_Game
                 // For the attemps 10 - 1
                 isMissShot = false;
                 Attemps = Attemps - 1;
-                gameBoard[SpotX, SpotY] = SpotStatus.Hit;
-            } else if (gameBoard[SpotX, SpotY] == SpotStatus.Empty)
+                gameBoard[X, Y] = SpotStatus.Hit;
+            } else if (gameBoard[X, Y] == SpotStatus.Empty)
             {
                 // For the attemps 10 - 1 = water
                 Attemps = Attemps - 1;
-                gameBoard[SpotX, SpotY] = SpotStatus.Miss;
+                gameBoard[X, Y] = SpotStatus.Miss;
                 isMissShot = true;
             }
             return true;
@@ -188,7 +186,7 @@ namespace Battle_Ship_Game
        
 
 
-        public void printBoardGame()
+        public void printBoardGame(bool isValidShot = false)
         {
             message.PrintWelcomeMessage();
            
@@ -238,7 +236,7 @@ namespace Battle_Ship_Game
             Console.WriteLine(gridLine);  
             Console.WriteLine(secondLine);
 
-            if(isCheckedShot)
+            if(isValidShot)
             {
                 message.PrintShotResult(isMissShot);
             }
@@ -246,7 +244,7 @@ namespace Battle_Ship_Game
             Console.ResetColor();         
         }
 
-        public bool CheckUniqueShot(Shot shotToValidate)
+        public bool CheckUniqueShot(int X, int Y)
         {
             bool isUniqueShot = true;
 
@@ -254,8 +252,8 @@ namespace Battle_Ship_Game
             {
                 foreach (var CoordY in numbers)
                 {
-                    if(gameBoard[shotToValidate.SpotX,shotToValidate.SpotY] == SpotStatus.Hit ||
-                    gameBoard[shotToValidate.SpotX,shotToValidate.SpotY] == SpotStatus.Miss)
+                    if(gameBoard[X,Y] == SpotStatus.Hit ||
+                    gameBoard[X,Y] == SpotStatus.Miss)
                     {
                         isUniqueShot = false;
                     }
